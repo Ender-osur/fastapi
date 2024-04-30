@@ -1,40 +1,36 @@
 from enum import Enum
-
 from fastapi import APIRouter, Depends
-
-from .strategy import BikeRoute, CarRoute, DroneRoute, MotorcycleRoute, RouteStrategy
-
-
-class Vehicle(Enum):
-    CAR = "car"
-    BIKE = "bike"
-    MOTORCYCLE = "motorcycle"
-    DRONE = "drone"
+from .strategy import PaymentStrategy, CreditCardPayment, PayPalPayment, BitcoinPayment, PsePayment, MercadoPagoPayment
 
 
-def get_strategy(vehicle: Vehicle) -> RouteStrategy:
-    defined_vehicles = {
-        Vehicle.CAR: CarRoute(),
-        Vehicle.BIKE: BikeRoute(),
-        Vehicle.MOTORCYCLE: MotorcycleRoute(),
-        Vehicle.DRONE: DroneRoute(),
+class Payment(Enum):
+    CREDIT_CARD = "credit_card"
+    PAYPAL = "paypal"
+    BITCOIN = "bitcoin"
+    PSE = "pse"
+    MERCADOPAGO = "mercadopago"
+
+
+def get_strategy(typeOfPayment: Payment) -> PaymentStrategy:
+    defined_payments = {
+        Payment.CREDIT_CARD: CreditCardPayment(),
+        Payment.PAYPAL: PayPalPayment(),
+        Payment.BITCOIN: BitcoinPayment(),
+        Payment.PSE: PsePayment(),
+        Payment.MERCADOPAGO: MercadoPagoPayment(),
     }
-    return defined_vehicles[vehicle]
-
+    return defined_payments[typeOfPayment]
 
 router = APIRouter()
 
+@router.get("/process_payment")
+def process_payment(amount: float, typeOfPayment: PaymentStrategy = Depends(get_strategy)) -> dict:
+    return {"status": typeOfPayment.process_payment(amount = amount)}
 
-@router.get("/best_route")
-def best_route(origin: int, destination: int, vehicle: RouteStrategy = Depends(get_strategy)) -> dict:
-    return vehicle.get_best_route(origin=origin, destination=destination)
+@router.get("/calculate_fees")
+def calculate_fees(amount: float, typeOfPayment: PaymentStrategy = Depends(get_strategy)) -> float:
+    return typeOfPayment.calculate_fees(amount = amount)
 
-
-@router.get("/cost")
-def cost(origin: int, destination: int, vehicle: RouteStrategy = Depends(get_strategy)) -> float:
-    return vehicle.get_cost(origin=origin, destination=destination)
-
-
-@router.get("/time")
-def time(origin: int, destination: int, vehicle: RouteStrategy = Depends(get_strategy)) -> float:
-    return vehicle.get_time(origin=origin, destination=destination)
+@router.get("/validate_transaction")
+def validate_transaction(transaction_id: str, typeOfPayment: PaymentStrategy = Depends(get_strategy)) -> bool:
+    return typeOfPayment.validate_transaction(transaction_id = transaction_id)

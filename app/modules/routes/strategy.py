@@ -1,59 +1,82 @@
 from abc import ABC, abstractmethod
 
+"""
+En este caso tenemos una tienda Online que vende licencias de software que recibe tres tipos de pagos:
+1. Tarjeta de crédito
+2. Paypal
+3. Bitcoin
+4. PSE
+5. MercadoPago
+"""
 
-class RouteStrategy(ABC):
+
+class PaymentStrategy(ABC):
     @abstractmethod
-    def get_best_route(self, origin: int, destination: int) -> dict:
+    def process_payment(self, amount: float) -> str:
         pass
 
     @abstractmethod
-    def get_cost(self, origin: int, destination: int) -> float:
+    def calculate_fees(self, amount: float) -> float:
         pass
 
     @abstractmethod
-    def get_time(self, origin: int, destination: int) -> float:
+    def validate_transaction(self, transaction_id: str) -> bool:
         pass
 
 
-class CarRoute(RouteStrategy):
-    def get_best_route(self, origin: int, destination: int) -> dict:
-        return {"start_street": origin, "end_street": destination, "route": "Use the avenue 123"}
+class CreditCardPayment(PaymentStrategy):
+    def process_payment(self, amount: float) -> str:
+        print(f"Processing credit card payment for {amount}")
 
-    def get_cost(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.1, 2)
+    def calculate_fees(self, amount: float) -> float:
+        return round(amount * 0.02, 2)
 
-    def get_time(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.5, 2)
-
-
-class BikeRoute(RouteStrategy):
-    def get_best_route(self, origin: int, destination: int) -> dict:
-        return {"start_street": origin, "end_street": destination, "route": "Use the bike lane"}
-
-    def get_cost(self, origin: int, destination: int) -> float:
-        return 0
-
-    def get_time(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 2, 2)
+    def validate_transaction(self, transaction_id: str) -> bool:
+        print(f"Validating transaction {transaction_id}")
+        return True
 
 
-class MotorcycleRoute(RouteStrategy):
-    def get_best_route(self, origin: int, destination: int) -> dict:
-        return {"start_street": origin, "end_street": destination, "route": "Use the motorcycle lane"}
+class PayPalPayment(PaymentStrategy):
+    def process_payment(self, amount: float) -> None:
+        print(f"Processing PayPal payment for {amount}")
 
-    def get_cost(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.05, 2)
+    def calculate_fees(self, amount: float) -> float:
+        return round(amount * 0.03, 2)
 
-    def get_time(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.25, 2)
+    def validate_transaction(self, transaction_id: str) -> bool:
+        print(f"Validating transaction {transaction_id}")
+        return True
 
 
-class DroneRoute(RouteStrategy):
-    def get_best_route(self, origin: int, destination: int) -> dict:
-        return {"start_street": origin, "end_street": destination, "route": "Use the air route"}
+class BitcoinPayment(PaymentStrategy):
+    def process_payment(self, amount: float) -> None:
+        print(f"Processing Bitcoin payment for {amount}")
 
-    def get_cost(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.01, 2)
+    def calculate_fees(self, amount: float) -> float:
+        return round(amount * 0.01, 2)
 
-    def get_time(self, origin: int, destination: int) -> float:
-        return round((destination - origin) * 0.1, 2)
+    def validate_transaction(self, transaction_id: str) -> bool:
+        print(f"Validating transaction {transaction_id}")
+        return True
+
+class PsePayment(PaymentStrategy):
+    def process_payment(self, amount: float) -> None:
+        print(f"Processing Bitcoin payment for {amount}")
+
+    def calculate_fees(self, amount: float) -> float:
+        return round(amount * 0.01, 2)
+
+    def validate_transaction(self, transaction_id: str) -> bool:
+        print(f"Validating transaction {transaction_id}")
+        return True
+
+class MercadoPagoPayment(PaymentStrategy):
+    def process_payment(self, amount: float) -> None:
+        print(f"Processing Bitcoin payment for {amount}")
+
+    def calculate_fees(self, amount: float) -> float:
+        return round(amount * 0.01, 2)
+
+    def validate_transaction(self, transaction_id: str) -> bool:
+        print(f"Validating transaction {transaction_id}")
+        return True
